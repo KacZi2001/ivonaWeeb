@@ -25,10 +25,21 @@ class Dictionary:
         lines = dict_file.readlines()
 
         for line in lines:
-            lst = line.split(" : ")
-            dic.update({lst[0]: lst[1]})
+            lst = line.strip().split(" : ")
+            if len(lst[0]) > 0:
+                dic.update({lst[0]: lst[1]})
 
+        dict_file.close()
         return dic
+
+    def _save_ini(self):
+        dict_file = open("dictionary.ini", "w")
+        print(self.test_dict)
+
+        for key in self.test_dict.keys():
+            dict_file.write("{} : {}\n".format(key, self.test_dict[key]))
+
+        dict_file.close()
 
     # New window that shows all dictionary elements
     def show_dict(self):
@@ -68,24 +79,28 @@ class Dictionary:
             dict_to_text.grid(row=0, column=1, padx=5, pady=5)
 
             def add_to_dict():
-                key = dict_from_text.get("1.0", tk.END)
-                value = dict_to_text.get("1.0", tk.END)
+                key = dict_from_text.get("1.0", tk.END).strip()
+                value = dict_to_text.get("1.0", tk.END).strip()
                 if key != "" and value != "":
                     self.test_dict.update({key: value})
                     add_new_element(key, value)
                 dict_root.destroy()
 
-            dict_cancel_button = tk.Button(dict_root, text="Cancel", command=root.destroy)
+            dict_cancel_button = tk.Button(dict_root, text="Cancel", command=dict_root.destroy)
             dict_cancel_button.grid(row=1, column=0, padx=5, pady=5)
             dict_add_button = tk.Button(dict_root, text="Add", command=add_to_dict)
             dict_add_button.grid(row=1, column=1, padx=5, pady=5)
             dict_root.mainloop()
 
+        def save_and_exit():
+            self._save_ini()
+            root.destroy()
+
         cancel_button = tk.Button(bottom_panel, text="Cancel", command=root.destroy)
         cancel_button.grid(row=0, column=0, padx=5, pady=5)
         add_button = tk.Button(bottom_panel, text="Add new...", command=add_dict_element)
         add_button.grid(row=0, column=1, padx=5, pady=5)
-        save_button = tk.Button(bottom_panel, text="Save")
+        save_button = tk.Button(bottom_panel, text="Save", command=save_and_exit)
         save_button.grid(row=0, column=2, padx=5, pady=5)
         root.mainloop()
 
