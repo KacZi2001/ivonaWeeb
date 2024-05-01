@@ -1,11 +1,12 @@
 import librosa
 import soundfile
-from playsound import playsound
+from pygame import mixer
 
 
 def play_audio(filename: str):
-    print(filename)
-    playsound(filename)
+    mixer.init()
+    sound = mixer.Sound(filename)
+    sound.play()
 
 
 def pitch_shift(filename: str, shift: float) -> None:

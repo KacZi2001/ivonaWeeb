@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import dicts
 from scripts import voice_request
+from threading import Thread
 
 
 class IvonaGui(tk.Tk):
@@ -57,12 +58,22 @@ class IvonaGui(tk.Tk):
         voice_label = tk.Label(upper_frame, text="Current Voice:", anchor=tk.W)
         voice_label.pack(fill=tk.X)
         voice_combobox = ttk.Combobox(upper_frame, textvariable=current_voice, values=list(dicts.NAME_DICT),
-                                      width=30)
+                                      width=30, state="readonly")
+        voice_combobox.current(0)
         voice_combobox.pack(fill=tk.X)
 
-        play_button.config(
-            command=lambda: voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
-                                                            pitch.get(), False))
+        # voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
+        #                                 pitch.get(), False)
+
+        def play_audio():
+            play_thread = Thread(target=voice_request.get_voice_request,
+                                 args=(dicts.NAME_DICT[current_voice.get()], inp_text.get("1.0", tk.END), pitch.get(), False))
+            play_thread.start()
+
+        # play_thread = Thread(target=voice_request.get_voice_request,
+        #                      args=(current_voice.get(), inp_text.get("1.0", tk.END), pitch.get(), False))
+
+        play_button.config(command=play_audio)
         save_button.config(
             command=lambda: voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
                                                             pitch.get(), True))
