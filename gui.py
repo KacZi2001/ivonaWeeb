@@ -67,16 +67,21 @@ class IvonaGui(tk.Tk):
 
         def play_audio():
             play_thread = Thread(target=voice_request.get_voice_request,
-                                 args=(dicts.NAME_DICT[current_voice.get()], inp_text.get("1.0", tk.END), pitch.get(), False))
+                                 args=(dicts.NAME_DICT[current_voice.get()], inp_text.get("1.0", tk.END),
+                                       pitch.get(), False))
             play_thread.start()
+
+        def save_audio():
+            save_thread = Thread(target=voice_request.get_voice_request,
+                                 args=(dicts.NAME_DICT[current_voice.get()], inp_text.get("1.0", tk.END),
+                                       pitch.get(), True))
+            save_thread.start()
 
         # play_thread = Thread(target=voice_request.get_voice_request,
         #                      args=(current_voice.get(), inp_text.get("1.0", tk.END), pitch.get(), False))
 
         play_button.config(command=play_audio)
-        save_button.config(
-            command=lambda: voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
-                                                            pitch.get(), True))
+        save_button.config(command=save_audio)
 
     def run(self):
         self.title("Ivona.WEEB")

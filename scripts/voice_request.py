@@ -11,19 +11,27 @@ def get_final_string(voice: str, text: str) -> str:
 
 
 def get_voice_request(voice: str, text: str, pitch: float, download: bool):
-    if text is not None and voice is not None:
+    if text != "" and voice != "":
         url = get_final_string(voice, text)
         if download:
             file_path = filedialog.asksaveasfilename(defaultextension=".wav",
                                                      filetypes=[("WAV Files", "*.wav")])
+            print("Downloading file...")
             urllib.request.urlretrieve(url, file_path)
+            print("File downloaded.")
             if pitch != 0.0:
+                print("Shifting audio pitch to {:.0f}...".format(pitch))
                 audio_manipulation.pitch_shift(file_path, pitch)
+                print("Pitch shifted.")
         else:
             temp_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+            print("Getting audio...")
             urllib.request.urlretrieve(url, temp_file.name)
+            print("Done getting audio.")
             temp_file.close()
             if pitch != 0.0:
+                print("Shifting audio pitch to {:.0f}...".format(pitch))
                 audio_manipulation.pitch_shift(temp_file.name, pitch)
+                print("Pitch shifted.")
             audio_manipulation.play_audio(temp_file.name)
             os.remove(temp_file.name)
