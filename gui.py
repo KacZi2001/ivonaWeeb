@@ -1,15 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
+import dicts
+from scripts import voice_request
 
 
 class IvonaGui(tk.Tk):
     def __init__(self):
         super().__init__()
         self.neko_img = tk.PhotoImage(file="neko.png").subsample(3)
-        self.voice_dict = {
-            "Jacek": "dopa",
-            "Bogdan": "dopa"
-        }
         self.gui_create()
 
     def gui_create(self):
@@ -58,9 +56,16 @@ class IvonaGui(tk.Tk):
         current_voice = tk.StringVar()
         voice_label = tk.Label(upper_frame, text="Current Voice:", anchor=tk.W)
         voice_label.pack(fill=tk.X)
-        voice_combobox = ttk.Combobox(upper_frame, textvariable=current_voice, values=list(self.voice_dict.keys()),
+        voice_combobox = ttk.Combobox(upper_frame, textvariable=current_voice, values=list(dicts.NAME_DICT),
                                       width=30)
         voice_combobox.pack(fill=tk.X)
+
+        play_button.config(
+            command=lambda: voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
+                                                            pitch.get(), False))
+        save_button.config(
+            command=lambda: voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
+                                                            pitch.get(), True))
 
     def run(self):
         self.title("Ivona.WEEB")
