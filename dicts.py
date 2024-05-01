@@ -17,10 +17,14 @@ NAME_DICT: dict[str, str] = {
 
 class Dictionary:
     def __init__(self):
-        self.test_dict = self._parse_ini()
+        self.dict = self._parse_ini()
 
-    def _parse_ini(self):
+    def get_dict(self) -> dict[str, str]:
+        return self.dict
+
+    def _parse_ini(self) -> dict[str, str]:
         dic = dict()
+        print("Parsing dictionary...")
         dict_file = open("dictionary.ini")
         lines = dict_file.readlines()
 
@@ -30,19 +34,21 @@ class Dictionary:
                 dic.update({lst[0]: lst[1]})
 
         dict_file.close()
+        print("Dictionary parsed")
         return dic
 
-    def _save_ini(self):
+    def _save_ini(self) -> None:
+        print("Saving dictionary...")
         dict_file = open("dictionary.ini", "w")
-        print(self.test_dict)
 
-        for key in self.test_dict.keys():
-            dict_file.write("{} : {}\n".format(key, self.test_dict[key]))
+        for key in self.dict.keys():
+            dict_file.write("{} : {}\n".format(key, self.dict[key]))
 
         dict_file.close()
+        print("Dictionary saved")
 
     # New window that shows all dictionary elements
-    def show_dict(self):
+    def show_dict(self) -> None:
         root = tk.Tk()
         root.title("Dictionary")
 
@@ -54,7 +60,7 @@ class Dictionary:
         bottom_panel.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=5, columnspan=2)
 
         # Function that creates new Text objects
-        def add_new_element(key, value):
+        def add_new_element(key, value) -> None:
             from_text = tk.Text(left_panel, width=25, height=1)
             from_text.insert(tk.END, key)
             from_text.config(state=tk.DISABLED)
@@ -66,11 +72,11 @@ class Dictionary:
             to_text.pack(fill=tk.X)
 
         # Adding new Text objects for all dictionary elements
-        for test_key in self.test_dict.keys():
-            add_new_element(test_key, self.test_dict[test_key])
+        for test_key in self.dict.keys():
+            add_new_element(test_key, self.dict[test_key])
 
         # New window that allows adding new elements
-        def add_dict_element():
+        def add_dict_element() -> None:
             dict_root = tk.Tk()
             dict_root.title("Add new element")
             dict_from_text = tk.Text(dict_root, width=25, height=1)
@@ -78,12 +84,13 @@ class Dictionary:
             dict_to_text = tk.Text(dict_root, width=25, height=1)
             dict_to_text.grid(row=0, column=1, padx=5, pady=5)
 
-            def add_to_dict():
-                key = dict_from_text.get("1.0", tk.END).strip()
-                value = dict_to_text.get("1.0", tk.END).strip()
+            def add_to_dict() -> None:
+                key: str = dict_from_text.get("1.0", tk.END).strip()
+                value: str = dict_to_text.get("1.0", tk.END).strip()
                 if key != "" and value != "":
-                    self.test_dict.update({key: value})
+                    self.dict.update({key: value})
                     add_new_element(key, value)
+                    print("Element added")
                 dict_root.destroy()
 
             dict_cancel_button = tk.Button(dict_root, text="Cancel", command=dict_root.destroy)
@@ -92,7 +99,7 @@ class Dictionary:
             dict_add_button.grid(row=1, column=1, padx=5, pady=5)
             dict_root.mainloop()
 
-        def save_and_exit():
+        def save_and_exit() -> None:
             self._save_ini()
             root.destroy()
 
@@ -103,7 +110,3 @@ class Dictionary:
         save_button = tk.Button(bottom_panel, text="Save", command=save_and_exit)
         save_button.grid(row=0, column=2, padx=5, pady=5)
         root.mainloop()
-
-
-if __name__ == '__main__':
-    Dictionary().show_dict()

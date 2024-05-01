@@ -11,6 +11,16 @@ class IvonaGui(tk.Tk):
         self.neko_img = tk.PhotoImage(file="neko.png").subsample(3)
         self.gui_create()
 
+    def _replace_text_with_dict(self, text: str) -> str:
+        dictionary: dict[str, str] = dicts.Dictionary().get_dict()
+        print("Replacing lines with dictionary...")
+        temp_text: str = text
+        for key, value in dictionary.items():
+            if key.lower() in text:
+                temp_text = temp_text.replace(key.lower(), value)
+        print("Done replacing")
+        return temp_text
+
     def gui_create(self):
         menu_bar = tk.Menu(self)
 
@@ -46,7 +56,7 @@ class IvonaGui(tk.Tk):
         stop_button.pack(fill=tk.X, pady=5)
         save_button = tk.Button(button_frame, text="Save File")
         save_button.pack(fill=tk.X, pady=5)
-        dict_button = tk.Button(button_frame, text="Dictionary")
+        dict_button = tk.Button(button_frame, text="Dictionary", command=dicts.Dictionary().show_dict)
         dict_button.pack(fill=tk.X, pady=5)
 
         pitch = tk.DoubleVar()
@@ -62,23 +72,19 @@ class IvonaGui(tk.Tk):
         voice_combobox.current(0)
         voice_combobox.pack(fill=tk.X)
 
-        # voice_request.get_voice_request(current_voice.get(), inp_text.get("1.0", tk.END),
-        #                                 pitch.get(), False)
-
         def play_audio():
             play_thread = Thread(target=voice_request.get_voice_request,
-                                 args=(dicts.NAME_DICT[current_voice.get()], inp_text.get("1.0", tk.END),
-                                       pitch.get(), False))
+                                         args=(dicts.NAME_DICT[current_voice.get()],
+                                               self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                               pitch.get(), False))
             play_thread.start()
 
         def save_audio():
             save_thread = Thread(target=voice_request.get_voice_request,
-                                 args=(dicts.NAME_DICT[current_voice.get()], inp_text.get("1.0", tk.END),
-                                       pitch.get(), True))
+                                         args=(dicts.NAME_DICT[current_voice.get()],
+                                               self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                               pitch.get(), True))
             save_thread.start()
-
-        # play_thread = Thread(target=voice_request.get_voice_request,
-        #                      args=(current_voice.get(), inp_text.get("1.0", tk.END), pitch.get(), False))
 
         play_button.config(command=play_audio)
         save_button.config(command=save_audio)

@@ -3,14 +3,14 @@ import soundfile
 from pygame import mixer
 
 
-def play_audio(filename: str):
+def play_audio(filename: str) -> None:
     mixer.init()
     sound = mixer.Sound(filename)
     sound.play()
 
 
 def pitch_shift(filename: str, shift: float) -> None:
-    res_type = "soxr_vhq"
+    res_type: str = "soxr_vhq"
     y, sr = librosa.load(filename)
     new_sr = 48000
     res_y = librosa.resample(y=y, orig_sr=sr, target_sr=new_sr, res_type=res_type)
