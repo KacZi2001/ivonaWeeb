@@ -1,14 +1,19 @@
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk, scrolledtext, filedialog
 import dicts
 from scripts import voice_request
+from scripts import audio_manipulation
 from threading import Thread
+from time import sleep
 
 
 class IvonaGui(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.neko_img = tk.PhotoImage(file="neko.png").subsample(3)
+        audio_manipulation.mixer.init()
+        self.frames = [tk.PhotoImage(file="images/bezi_talk.gif", format="gif -index %i" % i) for i in range(2)]
+        self.neko_label = tk.Label(self, image=self.frames[0])
+        self.current_lang = 1
         self.gui_create()
 
     def _replace_text_with_dict(self, text: str) -> str:
@@ -20,6 +25,12 @@ class IvonaGui(tk.Tk):
                 temp_text = temp_text.replace(key.lower(), value)
         print("Done replacing")
         return temp_text
+
+    def _open_file(self) -> str:
+        filename = filedialog.askopenfilename()
+        if filename:
+            with open(filename, "r", encoding="utf-8") as f:
+                return f.read().strip()
 
     def gui_create(self):
         menu_bar = tk.Menu(self)
@@ -35,7 +46,6 @@ class IvonaGui(tk.Tk):
         lang_menu = tk.Menu(menu_bar, tearoff=0)
         lang_menu.add_radiobutton(label="Polish")
         lang_menu.add_radiobutton(label="English")
-        lang_menu.invoke(1)
         menu_bar.add_cascade(label="Language", menu=lang_menu)
         self.config(menu=menu_bar)
 
@@ -44,8 +54,7 @@ class IvonaGui(tk.Tk):
         button_frame = tk.Frame(self)
         button_frame.grid(row=1, column=2, padx=10, pady=10, sticky=tk.NSEW)
 
-        neko_label = tk.Label(self, image=self.neko_img)
-        neko_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
+        self.neko_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
 
         inp_text = scrolledtext.ScrolledText(self, wrap=tk.WORD, height=10, width=40)
         inp_text.grid(row=1, column=0, padx=10, pady=10, sticky=tk.W, columnspan=2)
@@ -54,9 +63,10 @@ class IvonaGui(tk.Tk):
         play_button.pack(fill=tk.X, pady=5)
         stop_button = tk.Button(button_frame, text="Stop")
         stop_button.pack(fill=tk.X, pady=5)
-        save_button = tk.Button(button_frame, text="Save File")
+        save_button = tk.Button(button_frame, text="Save file...")
         save_button.pack(fill=tk.X, pady=5)
-        dict_button = tk.Button(button_frame, text="Dictionary", command=dicts.Dictionary().show_dict)
+        dict_button = tk.Button(button_frame, text="Dictionary...",
+                                command=lambda: dicts.Dictionary().show_dict(self.current_lang))
         dict_button.pack(fill=tk.X, pady=5)
 
         pitch = tk.DoubleVar()
@@ -65,29 +75,85 @@ class IvonaGui(tk.Tk):
         pitch_slider.pack(fill=tk.X, pady=5)
 
         current_voice = tk.StringVar()
-        voice_label = tk.Label(upper_frame, text="Current Voice:", anchor=tk.W)
+        voice_label = tk.Label(upper_frame, text="Current voice:", anchor=tk.W)
         voice_label.pack(fill=tk.X)
         voice_combobox = ttk.Combobox(upper_frame, textvariable=current_voice, values=list(dicts.NAME_DICT),
                                       width=30, state="readonly")
         voice_combobox.current(0)
         voice_combobox.pack(fill=tk.X)
 
+        # Changes program language
+        def _set_language(lang_index: int):
+            self.current_lang = lang_index
+            lang_list = dicts.LANG_LIST
+            file_menu.entryconfig(lang_index, label="penis")
+            file_menu.entryconfig(0, label=lang_list[0][lang_index])
+            file_menu.entryconfig(1, label=lang_list[1][lang_index])
+            file_menu.entryconfig(3, label=lang_list[2][lang_index])
+            file_menu.entryconfig(4, label=lang_list[3][lang_index])
+            menu_bar.entryconfig(1, label=lang_list[4][lang_index])
+            lang_menu.entryconfig(0, label=lang_list[5][lang_index])
+            lang_menu.entryconfig(1, label=lang_list[6][lang_index])
+            menu_bar.entryconfig(2, label=lang_list[7][lang_index])
+            play_button.config(text=lang_list[8][lang_index])
+            stop_button.config(text=lang_list[9][lang_index])
+            save_button.config(text=lang_list[10][lang_index])
+            dict_button.config(text=lang_list[11][lang_index])
+            pitch_slider.config(label=lang_list[12][lang_index])
+            voice_label.config(text=lang_list[13][lang_index])
+
         def play_audio():
             play_thread = Thread(target=voice_request.get_voice_request,
-                                         args=(dicts.NAME_DICT[current_voice.get()],
-                                               self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
-                                               pitch.get(), False))
+                                 args=(dicts.NAME_DICT[current_voice.get()],
+                                       self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                       pitch.get(), False))
             play_thread.start()
+
+            # Animates the mascot label image when audio is being played
+            def _animate_mascot(ind) -> None:
+                while not audio_manipulation.mixer.get_busy():
+                    sleep(0.1)
+                while audio_manipulation.mixer.get_busy():
+                    frame = self.frames[ind]
+                    ind += 1
+                    if ind == 2:
+                        ind = 0
+                    self.neko_label.config(image=frame)
+                    sleep(0.15)
+                self.neko_label.config(image=self.frames[0])
+            Thread(target=_animate_mascot, args=(0, )).start()
 
         def save_audio():
             save_thread = Thread(target=voice_request.get_voice_request,
-                                         args=(dicts.NAME_DICT[current_voice.get()],
-                                               self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
-                                               pitch.get(), True))
+                                 args=(dicts.NAME_DICT[current_voice.get()],
+                                       self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                       pitch.get(), True))
             save_thread.start()
+
+        # Creates about window and shows it
+        def show_about():
+            about_root = tk.Tk()
+            about_root.title(dicts.LANG_LIST[2][self.current_lang])
+            about_root.resizable(width=False, height=False)
+            about_root.geometry("250x60")
+            about_text = tk.Label(about_root, text="Ivona 2024 by Felikszusz Corpa")
+            about_text.pack(fill=tk.X)
+            about_ok_button = tk.Button(about_root, text="OK", command=about_root.destroy, width=10)
+            about_ok_button.pack(pady=5, side=tk.BOTTOM)
+            about_root.mainloop()
+
+        def read_from_file():
+            inp_text.insert(tk.END, self._open_file())
 
         play_button.config(command=play_audio)
         save_button.config(command=save_audio)
+        stop_button.config(command=audio_manipulation.stop_audio)
+        file_menu.entryconfig(0, command=read_from_file)
+        file_menu.entryconfig(1, command=save_audio)
+        file_menu.entryconfig(3, command=show_about)
+        lang_menu.entryconfig(0, command=lambda: _set_language(1))
+        lang_menu.entryconfig(1, command=lambda: _set_language(0))
+        lang_menu.invoke(0)
 
     def run(self):
         self.title("Ivona.WEEB")

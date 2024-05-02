@@ -24,13 +24,13 @@ def get_voice_request(voice: str, text: str, pitch: float, download: bool) -> No
                 print("Shifting audio pitch to {:.0f}...".format(pitch))
                 audio_manipulation.pitch_shift(file_path, pitch)
                 print("Pitch shifted")
-            print("All done")
+            print("All done\n")
 
         else:
             temp_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
             print("Getting audio...")
             urllib.request.urlretrieve(url, temp_file.name)
-            print("Done getting audio.")
+            print("Done getting audio")
             temp_file.close()
 
             if pitch != 0.0:
@@ -40,5 +40,6 @@ def get_voice_request(voice: str, text: str, pitch: float, download: bool) -> No
 
             print("Playing audio...")
             audio_manipulation.play_audio(temp_file.name)
-            print("Done playing audio.")
+            print("Done playing audio")
             os.remove(temp_file.name)
+            print("All done\n")

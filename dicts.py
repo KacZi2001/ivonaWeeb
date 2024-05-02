@@ -14,6 +14,29 @@ NAME_DICT: dict[str, str] = {
     "Zosia": "zosia"
 }
 
+LANG_LIST: list[list[str]] = [
+    ["Open...", "Otwórz..."],
+    ["Save...", "Zapisz..."],
+    ["About", "O programie"],
+    ["Exit", "Wyjście"],
+    ["File", "Plik"],
+    ["Polish", "Polski"],
+    ["English", "Angielski"],
+    ["Language", "Język"],
+    ["Play", "Odtwórz"],
+    ["Stop", "Zatrzymaj"],
+    ["Save file...", "Zapisz plik..."],
+    ["Dictionary...", "Słownik..."],
+    ["Pitch:", "Wysokość głosu:"],
+    ["Current voice:", "Wybrany głos:"],
+    ["Dictionary", "Słownik"],
+    ["Add new element", "Dodaj nowy element"],
+    ["Cancel", "Anuluj"],
+    ["Add", "Dodaj"],
+    ["Add new...", "Dodaj nowy..."],
+    ["Save", "Zapisz"]
+]
+
 
 class Dictionary:
     def __init__(self):
@@ -48,9 +71,9 @@ class Dictionary:
         print("Dictionary saved")
 
     # New window that shows all dictionary elements
-    def show_dict(self) -> None:
+    def show_dict(self, lang: int) -> None:
         root = tk.Tk()
-        root.title("Dictionary")
+        root.title(LANG_LIST[14][lang])
 
         left_panel = tk.Frame(root)
         left_panel.grid(row=0, column=0, sticky=tk.NSEW, padx=5, pady=5)
@@ -78,7 +101,7 @@ class Dictionary:
         # New window that allows adding new elements
         def add_dict_element() -> None:
             dict_root = tk.Tk()
-            dict_root.title("Add new element")
+            dict_root.title(LANG_LIST[15][lang])
             dict_from_text = tk.Text(dict_root, width=25, height=1)
             dict_from_text.grid(row=0, column=0, padx=5, pady=5)
             dict_to_text = tk.Text(dict_root, width=25, height=1)
@@ -93,9 +116,9 @@ class Dictionary:
                     print("Element added")
                 dict_root.destroy()
 
-            dict_cancel_button = tk.Button(dict_root, text="Cancel", command=dict_root.destroy)
+            dict_cancel_button = tk.Button(dict_root, text=LANG_LIST[16][lang], command=dict_root.destroy)
             dict_cancel_button.grid(row=1, column=0, padx=5, pady=5)
-            dict_add_button = tk.Button(dict_root, text="Add", command=add_to_dict)
+            dict_add_button = tk.Button(dict_root, text=LANG_LIST[17][lang], command=add_to_dict)
             dict_add_button.grid(row=1, column=1, padx=5, pady=5)
             dict_root.mainloop()
 
@@ -103,10 +126,10 @@ class Dictionary:
             self._save_ini()
             root.destroy()
 
-        cancel_button = tk.Button(bottom_panel, text="Cancel", command=root.destroy)
+        cancel_button = tk.Button(bottom_panel, text=LANG_LIST[16][lang], command=root.destroy)
         cancel_button.grid(row=0, column=0, padx=5, pady=5)
-        add_button = tk.Button(bottom_panel, text="Add new...", command=add_dict_element)
+        add_button = tk.Button(bottom_panel, text=LANG_LIST[18][lang], command=add_dict_element)
         add_button.grid(row=0, column=1, padx=5, pady=5)
-        save_button = tk.Button(bottom_panel, text="Save", command=save_and_exit)
+        save_button = tk.Button(bottom_panel, text=LANG_LIST[19][lang], command=save_and_exit)
         save_button.grid(row=0, column=2, padx=5, pady=5)
         root.mainloop()

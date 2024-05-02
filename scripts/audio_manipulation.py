@@ -4,9 +4,12 @@ from pygame import mixer
 
 
 def play_audio(filename: str) -> None:
-    mixer.init()
     sound = mixer.Sound(filename)
     sound.play()
+
+
+def stop_audio() -> None:
+    mixer.stop()
 
 
 def pitch_shift(filename: str, shift: float) -> None:
