@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 
 NAME_DICT: dict[str, str] = {
@@ -48,16 +49,17 @@ class Dictionary:
     def _parse_ini(self) -> dict[str, str]:
         dic = dict()
         print("Parsing dictionary...")
-        dict_file = open("dictionary.ini")
-        lines = dict_file.readlines()
+        if os.path.isfile("dictionary.ini"):
+            dict_file = open("dictionary.ini")
+            lines = dict_file.readlines()
 
-        for line in lines:
-            lst = line.strip().split(" : ")
-            if len(lst[0]) > 0:
-                dic.update({lst[0]: lst[1]})
+            for line in lines:
+                lst = line.strip().split(" : ")
+                if len(lst[0]) > 0:
+                    dic.update({lst[0]: lst[1]})
 
-        dict_file.close()
-        print("Dictionary parsed")
+            dict_file.close()
+            print("Dictionary parsed")
         return dic
 
     def _save_ini(self) -> None:
