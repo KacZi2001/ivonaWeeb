@@ -40,6 +40,4 @@ def get_voice_request(voice: str, text: str, pitch: float, download: bool) -> No
 
             print("Playing audio...")
             audio_manipulation.play_audio(temp_file.name)
-            print("Done playing audio")
             os.remove(temp_file.name)
-            print("All done\n")

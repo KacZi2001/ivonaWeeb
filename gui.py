@@ -124,6 +124,8 @@ class IvonaGui(tk.Tk):
                         self.neko_label.config(image=frame)
                         sleep(0.15)
                     self.neko_label.config(image=self.frames[0])
+                    print("Done playing audio")
+                    print("All done\n")
 
                 Thread(target=_animate_mascot, args=(0,)).start()
 
