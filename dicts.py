@@ -36,13 +36,21 @@ LANG_LIST: list[list[str]] = [
     ["Cancel", "Anuluj"],
     ["Add", "Dodaj"],
     ["Add new...", "Dodaj nowy..."],
-    ["Save", "Zapisz"]
+    ["Save", "Zapisz"],
+    ["Delete", "Usuń"]
 ]
 
 
 class Dictionary:
     def __init__(self):
         self.dict = self._parse_ini()
+
+    def _remove_elements(self, from_text: tk.Text, to_text: tk.Text, button: ttk.Button) -> None:
+        from_text.pack_forget()
+        to_text.pack_forget()
+        button.pack_forget()
+        self.dict.pop(from_text.get("1.0", tk.END).strip())
+        print("Element removed")
 
     def get_dict(self) -> dict[str, str]:
         return self.dict
@@ -83,8 +91,10 @@ class Dictionary:
         left_panel.grid(row=0, column=0, sticky=tk.NSEW, padx=5, pady=5)
         right_panel = ttk.Frame(root)
         right_panel.grid(row=0, column=1, sticky=tk.NSEW, padx=5, pady=5)
+        rightmost_panel = ttk.Frame(root)
+        rightmost_panel.grid(row=0, column=2, sticky=tk.NSEW, padx=5, pady=5)
         bottom_panel = ttk.Frame(root)
-        bottom_panel.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=5, columnspan=2)
+        bottom_panel.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=5, columnspan=3)
 
         # Function that creates new Text objects
         def add_new_element(key, value) -> None:
@@ -97,6 +107,10 @@ class Dictionary:
             to_text.insert(tk.END, value)
             to_text.config(state=tk.DISABLED)
             to_text.pack(fill=tk.X)
+
+            rem_button = ttk.Button(rightmost_panel, width=10, text=LANG_LIST[20][lang],
+                                    command=lambda: self._remove_elements(from_text, to_text, rem_button))
+            rem_button.pack(fill=tk.X)
 
         # Adding new Text objects for all dictionary elements
         for test_key in self.dict.keys():

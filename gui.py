@@ -108,22 +108,24 @@ class IvonaGui(tk.Tk):
                                  args=(dicts.NAME_DICT[current_voice.get()],
                                        self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
                                        pitch.get(), False))
-            play_thread.start()
+            # Check if nothing is playing
+            if not play_thread.is_alive() and not audio_manipulation.mixer.get_busy():
+                play_thread.start()
 
-            # Animates the mascot label image when audio is being played
-            def _animate_mascot(ind) -> None:
-                while not audio_manipulation.mixer.get_busy():
-                    sleep(0.1)
-                while audio_manipulation.mixer.get_busy():
-                    frame = self.frames[ind]
-                    ind += 1
-                    if ind == 2:
-                        ind = 0
-                    self.neko_label.config(image=frame)
-                    sleep(0.15)
-                self.neko_label.config(image=self.frames[0])
+                # Animates the mascot label image when audio is being played
+                def _animate_mascot(ind) -> None:
+                    while not audio_manipulation.mixer.get_busy():
+                        sleep(0.1)
+                    while audio_manipulation.mixer.get_busy():
+                        frame = self.frames[ind]
+                        ind += 1
+                        if ind == 2:
+                            ind = 0
+                        self.neko_label.config(image=frame)
+                        sleep(0.15)
+                    self.neko_label.config(image=self.frames[0])
 
-            Thread(target=_animate_mascot, args=(0,)).start()
+                Thread(target=_animate_mascot, args=(0,)).start()
 
         def save_audio():
             save_thread = Thread(target=voice_request.get_voice_request,
@@ -139,7 +141,7 @@ class IvonaGui(tk.Tk):
             about_root.title(dicts.LANG_LIST[2][self.current_lang])
             about_root.resizable(width=False, height=False)
             about_root.geometry("250x60")
-            about_text = ttk.Label(about_root, text="Ivona 2024 by Felikszusz Corpa", anchor=tk.CENTER)
+            about_text = ttk.Label(about_root, text="Ivona.WEEB © 2024 by Feliksz", anchor=tk.CENTER)
             about_text.pack(fill=tk.X)
             about_ok_button = ttk.Button(about_root, text="OK", command=about_root.destroy, width=10)
             about_ok_button.pack(pady=5, side=tk.BOTTOM)

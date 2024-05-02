@@ -9,7 +9,8 @@ def play_audio(filename: str) -> None:
 
 
 def stop_audio() -> None:
-    mixer.stop()
+    if mixer.get_busy():
+        mixer.stop()
 
 
 def pitch_shift(filename: str, shift: float) -> None:
