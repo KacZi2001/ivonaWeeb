@@ -23,17 +23,19 @@ echo Couldn't create venv
 goto :show_error
 
 :activate_venv
-set PYTHON = "venv\Scripts\python.exe"
+call venv/Scripts/activate.bat
 echo Venv activated
 
 :install
 echo Installing dependencies
-%PYTHON% -m pip install -r requirements.txt 2>tmp/stderr.txt
+%PYTHON% -m pip install -r requirements.txt >tmp/stdout.txt 2>tmp/stderr.txt
 if %ERRORLEVEL% == 0 goto :run
 echo Couldn't install dependencies
 goto :show_error
 
 :run
+echo Dependencies installed
+echo Running the program
 %PYTHON% main.py 2>tmp/stderr.txt
 if %ERRORLEVEL% == 0 goto execution:
 echo Couldn't run the program
