@@ -12,8 +12,9 @@ class IvonaGui(tk.Tk):
         super().__init__()
         audio_manipulation.mixer.init()
         self.frames = [tk.PhotoImage(file="images/bezi_talk.gif", format="gif -index %i" % i) for i in range(2)]
-        self.neko_label = tk.Label(self, image=self.frames[0])
+        self.neko_label = ttk.Label(self, image=self.frames[0])
         self.current_lang = 1
+        self.iconbitmap("images/icon.ico")
         self.gui_create()
 
     def _replace_text_with_dict(self, text: str) -> str:
@@ -49,9 +50,9 @@ class IvonaGui(tk.Tk):
         menu_bar.add_cascade(label="Language", menu=lang_menu)
         self.config(menu=menu_bar)
 
-        upper_frame = tk.Frame(self)
+        upper_frame = ttk.Frame(self)
         upper_frame.grid(row=0, column=1, padx=10, pady=10, sticky=tk.NSEW, columnspan=2)
-        button_frame = tk.Frame(self)
+        button_frame = ttk.Frame(self)
         button_frame.grid(row=1, column=2, padx=10, pady=10, sticky=tk.NSEW)
 
         self.neko_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.W)
@@ -59,14 +60,14 @@ class IvonaGui(tk.Tk):
         inp_text = scrolledtext.ScrolledText(self, wrap=tk.WORD, height=10, width=40)
         inp_text.grid(row=1, column=0, padx=10, pady=10, sticky=tk.W, columnspan=2)
 
-        play_button = tk.Button(button_frame, text="Play", width=10)
+        play_button = ttk.Button(button_frame, text="Play", width=10)
         play_button.pack(fill=tk.X, pady=5)
-        stop_button = tk.Button(button_frame, text="Stop")
+        stop_button = ttk.Button(button_frame, text="Stop")
         stop_button.pack(fill=tk.X, pady=5)
-        save_button = tk.Button(button_frame, text="Save file...")
+        save_button = ttk.Button(button_frame, text="Save file...")
         save_button.pack(fill=tk.X, pady=5)
-        dict_button = tk.Button(button_frame, text="Dictionary...",
-                                command=lambda: dicts.Dictionary().show_dict(self.current_lang))
+        dict_button = ttk.Button(button_frame, text="Dictionary...",
+                                 command=lambda: dicts.Dictionary().show_dict(self.current_lang))
         dict_button.pack(fill=tk.X, pady=5)
 
         pitch = tk.DoubleVar()
@@ -75,7 +76,7 @@ class IvonaGui(tk.Tk):
         pitch_slider.pack(fill=tk.X, pady=5)
 
         current_voice = tk.StringVar()
-        voice_label = tk.Label(upper_frame, text="Current voice:", anchor=tk.W)
+        voice_label = ttk.Label(upper_frame, text="Current voice:", anchor=tk.W)
         voice_label.pack(fill=tk.X)
         voice_combobox = ttk.Combobox(upper_frame, textvariable=current_voice, values=list(dicts.NAME_DICT),
                                       width=30, state="readonly")
@@ -121,7 +122,8 @@ class IvonaGui(tk.Tk):
                     self.neko_label.config(image=frame)
                     sleep(0.15)
                 self.neko_label.config(image=self.frames[0])
-            Thread(target=_animate_mascot, args=(0, )).start()
+
+            Thread(target=_animate_mascot, args=(0,)).start()
 
         def save_audio():
             save_thread = Thread(target=voice_request.get_voice_request,
@@ -133,12 +135,13 @@ class IvonaGui(tk.Tk):
         # Creates about window and shows it
         def show_about():
             about_root = tk.Tk()
+            about_root.iconbitmap("images/icon.ico")
             about_root.title(dicts.LANG_LIST[2][self.current_lang])
             about_root.resizable(width=False, height=False)
             about_root.geometry("250x60")
-            about_text = tk.Label(about_root, text="Ivona 2024 by Felikszusz Corpa")
+            about_text = ttk.Label(about_root, text="Ivona 2024 by Felikszusz Corpa", anchor=tk.CENTER)
             about_text.pack(fill=tk.X)
-            about_ok_button = tk.Button(about_root, text="OK", command=about_root.destroy, width=10)
+            about_ok_button = ttk.Button(about_root, text="OK", command=about_root.destroy, width=10)
             about_ok_button.pack(pady=5, side=tk.BOTTOM)
             about_root.mainloop()
 

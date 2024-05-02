@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from tkinter import ttk
 
 NAME_DICT: dict[str, str] = {
     "Jacek": "ivona",
@@ -75,13 +76,14 @@ class Dictionary:
     # New window that shows all dictionary elements
     def show_dict(self, lang: int) -> None:
         root = tk.Tk()
+        root.iconbitmap("images/icon.ico")
         root.title(LANG_LIST[14][lang])
 
-        left_panel = tk.Frame(root)
+        left_panel = ttk.Frame(root)
         left_panel.grid(row=0, column=0, sticky=tk.NSEW, padx=5, pady=5)
-        right_panel = tk.Frame(root)
+        right_panel = ttk.Frame(root)
         right_panel.grid(row=0, column=1, sticky=tk.NSEW, padx=5, pady=5)
-        bottom_panel = tk.Frame(root)
+        bottom_panel = ttk.Frame(root)
         bottom_panel.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=5, columnspan=2)
 
         # Function that creates new Text objects
@@ -103,6 +105,7 @@ class Dictionary:
         # New window that allows adding new elements
         def add_dict_element() -> None:
             dict_root = tk.Tk()
+            dict_root.iconbitmap("images/icon.ico")
             dict_root.title(LANG_LIST[15][lang])
             dict_from_text = tk.Text(dict_root, width=25, height=1)
             dict_from_text.grid(row=0, column=0, padx=5, pady=5)
@@ -118,9 +121,9 @@ class Dictionary:
                     print("Element added")
                 dict_root.destroy()
 
-            dict_cancel_button = tk.Button(dict_root, text=LANG_LIST[16][lang], command=dict_root.destroy)
+            dict_cancel_button = ttk.Button(dict_root, text=LANG_LIST[16][lang], command=dict_root.destroy)
             dict_cancel_button.grid(row=1, column=0, padx=5, pady=5)
-            dict_add_button = tk.Button(dict_root, text=LANG_LIST[17][lang], command=add_to_dict)
+            dict_add_button = ttk.Button(dict_root, text=LANG_LIST[17][lang], command=add_to_dict)
             dict_add_button.grid(row=1, column=1, padx=5, pady=5)
             dict_root.mainloop()
 
@@ -128,10 +131,10 @@ class Dictionary:
             self._save_ini()
             root.destroy()
 
-        cancel_button = tk.Button(bottom_panel, text=LANG_LIST[16][lang], command=root.destroy)
+        cancel_button = ttk.Button(bottom_panel, text=LANG_LIST[16][lang], command=root.destroy)
         cancel_button.grid(row=0, column=0, padx=5, pady=5)
-        add_button = tk.Button(bottom_panel, text=LANG_LIST[18][lang], command=add_dict_element)
+        add_button = ttk.Button(bottom_panel, text=LANG_LIST[18][lang], command=add_dict_element)
         add_button.grid(row=0, column=1, padx=5, pady=5)
-        save_button = tk.Button(bottom_panel, text=LANG_LIST[19][lang], command=save_and_exit)
+        save_button = ttk.Button(bottom_panel, text=LANG_LIST[19][lang], command=save_and_exit)
         save_button.grid(row=0, column=2, padx=5, pady=5)
         root.mainloop()
