@@ -1,5 +1,6 @@
 @echo off
 
+if EXIST tmp rmdir /s /q tmp
 mkdir tmp
 
 python -V >NUL 2>tmp/stderr.txt
