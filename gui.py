@@ -19,12 +19,12 @@ class IvonaGui(tk.Tk):
 
     def _replace_text_with_dict(self, text: str) -> str:
         dictionary: dict[str, str] = dicts.Dictionary().get_dict()
-        print("Replacing lines with dictionary...")
-        temp_text: str = text
-        for key, value in dictionary.items():
-            if key.lower() in text:
-                temp_text = temp_text.replace(key.lower(), value)
-        print("Done replacing")
+        temp_text: str = text.lower()
+        if len(dictionary) != 0:
+            for key, value in dictionary.items():
+                if key.lower() in temp_text:
+                    print("Replacing lines with dictionary...")
+                    temp_text = temp_text.replace(key.lower(), value.lower())
         return temp_text
 
     def _open_file(self) -> str:
@@ -104,37 +104,38 @@ class IvonaGui(tk.Tk):
             voice_label.config(text=lang_list[13][lang_index])
 
         def play_audio():
-            play_thread = Thread(target=voice_request.get_voice_request,
-                                 args=(dicts.NAME_DICT[current_voice.get()],
-                                       self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
-                                       pitch.get(), False))
-            # Check if nothing is playing
-            if not play_thread.is_alive() and not audio_manipulation.mixer.get_busy():
-                play_thread.start()
+            if current_voice.get().strip() != "" and inp_text.get("1.0", tk.END).strip() != "":
+                play_thread = Thread(target=voice_request.get_voice_request,
+                                     args=(dicts.NAME_DICT[current_voice.get()],
+                                           self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                           pitch.get(), False))
+                # Check if nothing is playing
+                if not play_thread.is_alive() and not audio_manipulation.mixer.get_busy():
+                    play_thread.start()
 
-                # Animates the mascot label image when audio is being played
-                def _animate_mascot(ind) -> None:
-                    while not audio_manipulation.mixer.get_busy():
-                        sleep(0.1)
-                    while audio_manipulation.mixer.get_busy():
-                        frame = self.frames[ind]
-                        ind += 1
-                        if ind == 2:
-                            ind = 0
-                        self.neko_label.config(image=frame)
-                        sleep(0.15)
-                    self.neko_label.config(image=self.frames[0])
-                    print("Done playing audio")
-                    print("All done\n")
+                    # Animates the mascot label image when audio is being played
+                    def _animate_mascot(ind) -> None:
+                        while not audio_manipulation.mixer.get_busy():
+                            sleep(0.1)
+                        while audio_manipulation.mixer.get_busy():
+                            frame = self.frames[ind]
+                            ind += 1
+                            if ind == 2:
+                                ind = 0
+                            self.neko_label.config(image=frame)
+                            sleep(0.15)
+                        self.neko_label.config(image=self.frames[0])
+                        print("All done\n")
 
-                Thread(target=_animate_mascot, args=(0,)).start()
+                    Thread(target=_animate_mascot, args=(0,)).start()
 
         def save_audio():
-            save_thread = Thread(target=voice_request.get_voice_request,
-                                 args=(dicts.NAME_DICT[current_voice.get()],
-                                       self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
-                                       pitch.get(), True))
-            save_thread.start()
+            if current_voice.get().strip() != "" and inp_text.get("1.0", tk.END).strip() != "":
+                save_thread = Thread(target=voice_request.get_voice_request,
+                                     args=(dicts.NAME_DICT[current_voice.get()],
+                                           self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                           pitch.get(), True))
+                save_thread.start()
 
         # Creates about window and shows it
         def show_about():

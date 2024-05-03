@@ -68,7 +68,6 @@ class Dictionary:
                     dic.update({lst[0]: lst[1]})
 
             dict_file.close()
-            print("Dictionary parsed")
         return dic
 
     def _save_ini(self) -> None:
@@ -79,7 +78,6 @@ class Dictionary:
             dict_file.write("{} : {}\n".format(key, self.dict[key]))
 
         dict_file.close()
-        print("Dictionary saved")
 
     # New window that shows all dictionary elements
     def show_dict(self, lang: int) -> None:

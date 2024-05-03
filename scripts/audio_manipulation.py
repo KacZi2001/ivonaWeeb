@@ -1,6 +1,8 @@
 import librosa
 import soundfile
-from pygame import mixer
+import contextlib
+with contextlib.redirect_stdout(None):
+    from pygame import mixer
 
 
 def play_audio(filename: str) -> None:
