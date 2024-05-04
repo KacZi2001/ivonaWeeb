@@ -21,9 +21,12 @@ class IvonaGui(tk.Tk):
         dictionary: dict[str, str] = dicts.Dictionary().get_dict()
         temp_text: str = text.lower()
         if len(dictionary) != 0:
+            line_not_printed: bool = True
             for key, value in dictionary.items():
                 if key.lower() in temp_text:
-                    print("Replacing lines with dictionary...")
+                    if line_not_printed:
+                        print("Replacing lines with dictionary...")
+                        line_not_printed = False
                     temp_text = temp_text.replace(key.lower(), value.lower())
         return temp_text
 
