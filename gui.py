@@ -1,17 +1,21 @@
+"""
+This file is the main GUI program for the Ivona.WEEB.
+"""
 import tkinter as tk
 from tkinter import ttk, scrolledtext, filedialog
+from threading import Thread
+from time import sleep
 import dicts
 from scripts import voice_request
 from scripts import audio_manipulation
-from threading import Thread
-from time import sleep
 
 
 class IvonaGui(tk.Tk):
+    """This class is responsible for the GUI part of the Ivona.WEEB."""
     def __init__(self):
         super().__init__()
         audio_manipulation.mixer.init()
-        self.frames = [tk.PhotoImage(file="images/bezi_talk.gif", format="gif -index %i" % i) for i in range(2)]
+        self.frames = [tk.PhotoImage(file="images/bezi_talk.gif", format=f"gif -index {i}") for i in range(2)]
         self.neko_label = ttk.Label(self, image=self.frames[0])
         self.current_lang = 1
         self.iconbitmap("images/icon.ico")
@@ -19,6 +23,10 @@ class IvonaGui(tk.Tk):
         self.replace_dict = dicts.Dictionary()
 
     def _replace_text_with_dict(self, text: str) -> str:
+        """
+        This method replaces the text from the main text box
+        with the text from the dictionary.
+        """
         temp_text: str = text.lower()
         if len(self.replace_dict.get_dict()) != 0:
             line_not_printed: bool = True
@@ -31,12 +39,18 @@ class IvonaGui(tk.Tk):
         return temp_text
 
     def _open_file(self) -> str:
+        """
+        This method opens the text file and writes the content
+        of it to the text box.
+        """
         filename = filedialog.askopenfilename()
         if filename:
             with open(filename, "r", encoding="utf-8") as f:
                 return f.read().strip()
+        return ""
 
     def gui_create(self):
+        """This method creates and sets up the GUI."""
         menu_bar = tk.Menu(self)
 
         file_menu = tk.Menu(menu_bar, tearoff=0)
@@ -74,8 +88,8 @@ class IvonaGui(tk.Tk):
         dict_button.pack(fill=tk.X, pady=5)
 
         pitch = tk.DoubleVar()
-        pitch_slider = tk.Scale(upper_frame, variable=pitch, orient=tk.HORIZONTAL, from_=-30.0, to=30.0, label="Pitch:",
-                                length=200)
+        pitch_slider = tk.Scale(upper_frame, variable=pitch, orient=tk.HORIZONTAL,
+                                from_=-30.0, to=30.0, label="Pitch:", length=200)
         pitch_slider.pack(fill=tk.X, pady=5)
 
         current_voice = tk.StringVar()
@@ -88,6 +102,7 @@ class IvonaGui(tk.Tk):
 
         # Changes program language
         def _set_language(lang_index: int):
+            """Function that changes the language of the GUI."""
             self.current_lang = lang_index
             lang_list = dicts.LANG_LIST
             file_menu.entryconfig(lang_index, label="penis")
@@ -107,10 +122,12 @@ class IvonaGui(tk.Tk):
             voice_label.config(text=lang_list[13][lang_index])
 
         def play_audio():
+            """Function that plays the audio in another thread."""
             if current_voice.get().strip() != "" and inp_text.get("1.0", tk.END).strip() != "":
                 play_thread = Thread(target=voice_request.get_voice_request,
                                      args=(dicts.NAME_DICT[current_voice.get()],
-                                           self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
+                                           self._replace_text_with_dict(
+                                               inp_text.get("1.0", tk.END)),
                                            pitch.get(), False))
                 # Check if nothing is playing
                 if not play_thread.is_alive() and not audio_manipulation.mixer.get_busy():
@@ -118,6 +135,10 @@ class IvonaGui(tk.Tk):
 
                     # Animates the mascot label image when audio is being played
                     def _animate_mascot(ind) -> None:
+                        """
+                        Function that animates the mascot image when
+                        the audio is being played.
+                        """
                         while not audio_manipulation.mixer.get_busy():
                             sleep(0.1)
                         while audio_manipulation.mixer.get_busy():
@@ -133,6 +154,7 @@ class IvonaGui(tk.Tk):
                     Thread(target=_animate_mascot, args=(0,)).start()
 
         def save_audio():
+            """Function that saves the audio in another thread."""
             if current_voice.get().strip() != "" and inp_text.get("1.0", tk.END).strip() != "":
                 save_thread = Thread(target=voice_request.get_voice_request,
                                      args=(dicts.NAME_DICT[current_voice.get()],
@@ -140,8 +162,8 @@ class IvonaGui(tk.Tk):
                                            pitch.get(), True))
                 save_thread.start()
 
-        # Creates about window and shows it
         def show_about():
+            """Function that shows the About window."""
             about_root = tk.Tk()
             about_root.iconbitmap("images/icon.ico")
             about_root.title(dicts.LANG_LIST[2][self.current_lang])
@@ -154,6 +176,7 @@ class IvonaGui(tk.Tk):
             about_root.mainloop()
 
         def read_from_file():
+            """Function that inserts the text from file to text box."""
             file_string = self._open_file()
             if file_string:
                 inp_text.insert(tk.END, file_string)
@@ -174,6 +197,7 @@ class IvonaGui(tk.Tk):
         lang_menu.invoke(0)
 
     def run(self):
+        """Method that runs the GUI."""
         self.title("Ivona.WEEB")
         self.resizable(False, False)
         self.mainloop()

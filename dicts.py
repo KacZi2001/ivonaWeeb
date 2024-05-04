@@ -1,3 +1,7 @@
+"""
+This file is responsible for holding all the constant
+dictionaries and the Dictionary class.
+"""
 import json
 import os
 import tkinter as tk
@@ -43,14 +47,20 @@ LANG_LIST: list[list[str]] = [
 
 
 class Dictionary:
+    """
+    This class is responsible for getting the dictionary from
+    the json file and also writing the dictionary to that file.
+    """
     def __init__(self):
         self.dict = self.parse_json()
 
     def get_dict(self) -> dict[str, str]:
+        """This method returns the dictionary from the class."""
         return self.dict
 
     def parse_json(self) -> dict[str, str]:
-        dic = dict()
+        """This method parses the json file and returns the dictionary."""
+        dic: dict[str, str] = {}
         if os.path.isfile("dictionary.json"):
             print("Parsing dictionary...")
             with open("dictionary.json", encoding="utf-8") as file:
@@ -58,13 +68,15 @@ class Dictionary:
         return dic
 
     def save_json(self) -> None:
+        """This method saves the dictionary to the json file."""
         if len(self.dict) > 0:
             print("Saving dictionary...")
             with open("dictionary.json", "w", encoding="utf-8") as file:
                 json.dump(self.dict, file, indent=4, ensure_ascii=False)
 
     # New window that shows all dictionary elements
-    def show_dict(self, lang: int) -> dict[str, str]:
+    def show_dict(self, lang: int) -> None:
+        """This method shows the dictionary in the GUI."""
         root = tk.Tk()
         root.iconbitmap("images/icon.ico")
         root.title(LANG_LIST[14][lang])
@@ -74,13 +86,13 @@ class Dictionary:
         bottom_panel = ttk.Frame(root)
         bottom_panel.pack(side=tk.BOTTOM, fill=tk.BOTH)
 
-        # Function that allows moving between widgets
         def focus_next(event) -> str:
+            """Function that allows moving between widgets"""
             event.widget.tk_focusNext().focus()
             return "break"
 
-        # Function that creates new Text objects
         def add_new_element(key: str, value: str) -> None:
+            """Function that creates new Text objects"""
             current_row: int = main_panel.grid_size()[1]
 
             from_text = tk.Text(main_panel, width=25, height=1)
@@ -98,6 +110,7 @@ class Dictionary:
             rem_button.grid(row=current_row, column=2, padx=3, pady=3)
 
             def remove_element() -> None:
+                """Function that removes dictionary entries."""
                 from_text.grid_remove()
                 to_text.grid_remove()
                 rem_button.grid_remove()
@@ -108,8 +121,11 @@ class Dictionary:
         for test_key in self.dict.keys():
             add_new_element(test_key, self.dict[test_key])
 
-        # Clear the dictionary and add all text elements
         def save_all_elements() -> None:
+            """
+            Function that clears the dictionary and adds
+            all elements from the text boxes to it.
+            """
             self.dict.clear()
             for key, value in zip(reversed(main_panel.grid_slaves(column=0)),
                                   reversed(main_panel.grid_slaves(column=1))):
@@ -121,6 +137,10 @@ class Dictionary:
                     self.dict.update({key_str: value_str})
 
         def save_and_exit() -> None:
+            """
+            Function that calls the save all elements function
+            and saves all changes to json file.
+            """
             save_all_elements()
             self.save_json()
             root.destroy()
