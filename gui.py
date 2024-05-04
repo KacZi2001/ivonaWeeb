@@ -184,10 +184,15 @@ class IvonaGui(tk.Tk):
             if file_string:
                 inp_text.insert(tk.END, file_string)
 
+        def quick_play():
+            inp_text.delete(inp_text.index("end-1c"))
+            play_audio()
+
         self.bind_all("<Control-o>", lambda event: read_from_file())
         self.bind_all("<Control-O>", lambda event: read_from_file())
         self.bind_all("<Control-s>", lambda event: save_audio())
         self.bind_all("<Control-S>", lambda event: save_audio())
+        self.bind_all("<Shift-Return>", lambda event: quick_play())
 
         play_button.config(command=play_audio)
         save_button.config(command=save_audio)
