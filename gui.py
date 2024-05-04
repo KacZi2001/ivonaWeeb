@@ -21,6 +21,7 @@ class IvonaGui(tk.Tk):
         self.iconbitmap("images/icon.ico")
         self.gui_create()
         self.replace_dict = dicts.Dictionary()
+        self.not_playing = True
 
     def _replace_text_with_dict(self, text: str) -> str:
         """
@@ -130,7 +131,8 @@ class IvonaGui(tk.Tk):
                                                inp_text.get("1.0", tk.END)),
                                            pitch.get(), False))
                 # Check if nothing is playing
-                if not play_thread.is_alive() and not audio_manipulation.mixer.get_busy():
+                if self.not_playing:
+                    self.not_playing = False
                     play_thread.start()
 
                     # Animates the mascot label image when audio is being played
@@ -149,6 +151,7 @@ class IvonaGui(tk.Tk):
                             self.neko_label.config(image=frame)
                             sleep(0.15)
                         self.neko_label.config(image=self.frames[0])
+                        self.not_playing = True
                         print("All done\n")
 
                     Thread(target=_animate_mascot, args=(0,)).start()

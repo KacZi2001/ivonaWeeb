@@ -79,6 +79,7 @@ class Dictionary:
         """This method shows the dictionary in the GUI."""
         root = tk.Tk()
         root.iconbitmap("images/icon.ico")
+        root.resizable(False, False)
         root.title(LANG_LIST[14][lang])
 
         main_panel = ttk.Frame(root)
