@@ -16,13 +16,13 @@ class IvonaGui(tk.Tk):
         self.current_lang = 1
         self.iconbitmap("images/icon.ico")
         self.gui_create()
+        self.replace_dict = dicts.Dictionary()
 
     def _replace_text_with_dict(self, text: str) -> str:
-        dictionary: dict[str, str] = dicts.Dictionary().get_dict()
         temp_text: str = text.lower()
-        if len(dictionary) != 0:
+        if len(self.replace_dict.get_dict()) != 0:
             line_not_printed: bool = True
-            for key, value in dictionary.items():
+            for key, value in self.replace_dict.get_dict().items():
                 if key.lower() in temp_text:
                     if line_not_printed:
                         print("Replacing lines with dictionary...")
@@ -40,17 +40,17 @@ class IvonaGui(tk.Tk):
         menu_bar = tk.Menu(self)
 
         file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Open...")
-        file_menu.add_command(label="Save...")
+        file_menu.add_command(label="Open...", underline=0, accelerator="Ctrl+O")
+        file_menu.add_command(label="Save...", underline=0, accelerator="Ctrl+S")
         file_menu.add_separator()
-        file_menu.add_command(label="About")
-        file_menu.add_command(label="Exit", command=self.destroy)
-        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="About", underline=3)
+        file_menu.add_command(label="Exit", underline=0, command=self.destroy)
+        menu_bar.add_cascade(label="File", menu=file_menu, underline=0)
 
         lang_menu = tk.Menu(menu_bar, tearoff=0)
-        lang_menu.add_radiobutton(label="Polish")
-        lang_menu.add_radiobutton(label="English")
-        menu_bar.add_cascade(label="Language", menu=lang_menu)
+        lang_menu.add_radiobutton(label="Polish", underline=0)
+        lang_menu.add_radiobutton(label="English", underline=0)
+        menu_bar.add_cascade(label="Language", menu=lang_menu, underline=0)
         self.config(menu=menu_bar)
 
         upper_frame = ttk.Frame(self)
@@ -70,7 +70,7 @@ class IvonaGui(tk.Tk):
         save_button = ttk.Button(button_frame, text="Save file...")
         save_button.pack(fill=tk.X, pady=5)
         dict_button = ttk.Button(button_frame, text="Dictionary...",
-                                 command=lambda: dicts.Dictionary().show_dict(self.current_lang))
+                                 command=lambda: self.replace_dict.show_dict(self.current_lang))
         dict_button.pack(fill=tk.X, pady=5)
 
         pitch = tk.DoubleVar()
@@ -154,7 +154,14 @@ class IvonaGui(tk.Tk):
             about_root.mainloop()
 
         def read_from_file():
-            inp_text.insert(tk.END, self._open_file())
+            file_string = self._open_file()
+            if file_string:
+                inp_text.insert(tk.END, file_string)
+
+        self.bind_all("<Control-o>", lambda event: read_from_file())
+        self.bind_all("<Control-O>", lambda event: read_from_file())
+        self.bind_all("<Control-s>", lambda event: save_audio())
+        self.bind_all("<Control-S>", lambda event: save_audio())
 
         play_button.config(command=play_audio)
         save_button.config(command=save_audio)

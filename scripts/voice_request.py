@@ -15,14 +15,15 @@ def get_voice_request(voice: str, text: str, pitch: float, download: bool) -> No
     if download:
         file_path = filedialog.asksaveasfilename(defaultextension=".wav",
                                                  filetypes=[("WAV Files", "*.wav")])
-        print("Downloading file...")
-        urllib.request.urlretrieve(url, file_path)
+        if file_path:
+            print("Downloading file...")
+            urllib.request.urlretrieve(url, file_path)
 
-        if pitch != 0.0:
-            print("Shifting audio pitch to {:.0f}...".format(pitch))
-            audio_manipulation.pitch_shift(file_path, pitch)
-            print("Pitch shifted")
-        print("All done\n")
+            if pitch != 0.0:
+                print("Shifting audio pitch to {:.0f}...".format(pitch))
+                audio_manipulation.pitch_shift(file_path, pitch)
+                print("Pitch shifted")
+            print("All done\n")
 
     else:
         temp_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
