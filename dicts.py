@@ -38,7 +38,7 @@ LANG_LIST: list[list[str]] = [
     ["Add", "Dodaj"],
     ["Add new...", "Dodaj nowy..."],
     ["Save", "Zapisz"],
-    ["Delete", "Usuń"]
+    ["Delete line ", "Usuń linię "]
 ]
 
 
@@ -46,7 +46,8 @@ class Dictionary:
     def __init__(self):
         self.dict = self._parse_json()
 
-    def _remove_elements(self, from_text: tk.Text, to_text: tk.Text, button: ttk.Button) -> None:
+    def _remove_elements(self, pos_label: ttk.Label, from_text: tk.Text, to_text: tk.Text, button: ttk.Button) -> None:
+        pos_label.pack_forget()
         from_text.pack_forget()
         to_text.pack_forget()
         button.pack_forget()
@@ -98,37 +99,50 @@ class Dictionary:
         root.iconbitmap("images/icon.ico")
         root.title(LANG_LIST[14][lang])
 
+        leftmost_panel = ttk.Frame(root)
+        leftmost_panel.grid(row=0, column=0, sticky=tk.NSEW, padx=5, pady=5)
         left_panel = ttk.Frame(root)
-        left_panel.grid(row=0, column=0, sticky=tk.NSEW, padx=5, pady=5)
+        left_panel.grid(row=0, column=1, sticky=tk.NSEW, padx=5, pady=5)
         right_panel = ttk.Frame(root)
-        right_panel.grid(row=0, column=1, sticky=tk.NSEW, padx=5, pady=5)
+        right_panel.grid(row=0, column=2, sticky=tk.NSEW, padx=5, pady=5)
         rightmost_panel = ttk.Frame(root)
-        rightmost_panel.grid(row=0, column=2, sticky=tk.NSEW, padx=5, pady=5)
+        rightmost_panel.grid(row=0, column=3, sticky=tk.NSEW, padx=5, pady=5)
         bottom_panel = ttk.Frame(root)
         bottom_panel.grid(row=1, column=0, sticky=tk.NSEW, padx=5, pady=5, columnspan=3)
 
         # Function that allows moving between widgets
         def focus_next(event) -> str:
-            # event.widget.tk_focusNext().focus()
-            print(event.widget.tk_focusNext())
+            if event.widget in left_panel.pack_slaves():
+                current_index: int = left_panel.pack_slaves().index(event.widget)
+                right_panel.pack_slaves()[current_index].focus()
+            else:
+                current_index: int = right_panel.pack_slaves().index(event.widget) + 1
+                if current_index in range(1, len(left_panel.pack_slaves())):
+                    left_panel.pack_slaves()[current_index].focus()
             return "break"
 
         # Function that creates new Text objects
         def add_new_element(key: str, value: str) -> None:
-            from_text = tk.Text(left_panel, width=25, height=1)
-            from_text.pack(fill=tk.X)
+            pos_label = ttk.Label(leftmost_panel, padding=3)
+            pos_label.pack(fill=tk.BOTH)
 
-            to_text = tk.Text(right_panel, width=25, height=1)
-            to_text.pack(fill=tk.X)
+            from_text = tk.Text(left_panel, width=25, height=1, pady=3)
+            from_text.pack(fill=tk.BOTH)
+
+            to_text = tk.Text(right_panel, width=25, height=1, pady=3)
+            to_text.pack(fill=tk.BOTH)
 
             from_text.insert(tk.END, key)
             to_text.insert(tk.END, value)
             from_text.bind("<Tab>", focus_next)
             to_text.bind("<Tab>", focus_next)
 
-            rem_button = ttk.Button(rightmost_panel, width=10, text=LANG_LIST[20][lang],
-                                    command=lambda: self._remove_elements(from_text, to_text, rem_button))
-            rem_button.pack(fill=tk.X)
+            rem_button = ttk.Button(rightmost_panel, width=15,
+                                    command=lambda: self._remove_elements(pos_label, from_text, to_text, rem_button))
+            rem_button.pack(fill=tk.BOTH)
+            current_line: int = rightmost_panel.pack_slaves().index(rem_button)
+            rem_button.config(text=LANG_LIST[20][lang] + str(current_line + 1))
+            pos_label.config(text=str(current_line + 1) + ".")
 
         # Adding new Text objects for all dictionary elements
         for test_key in self.dict.keys():
