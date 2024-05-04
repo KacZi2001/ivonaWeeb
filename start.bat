@@ -26,11 +26,6 @@ echo Pulling the newest version...
 git pull >tmp/stdout.txt 2>tmp/stderr.txt
 if %ERRORLEVEL% == 0 goto :check_venv
 echo Couldn't pull the newest version.
-echo.
-echo stdout:
-type tmp/stdout.txt
-echo.
-type tmp/stderr.txt
 
 :check_venv
 if EXIST "venv\Scripts\python.exe" goto :activate_venv

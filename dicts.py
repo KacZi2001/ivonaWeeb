@@ -77,8 +77,8 @@ class Dictionary:
     # New window that shows all dictionary elements
     def show_dict(self, lang: int) -> None:
         """This method shows the dictionary in the GUI."""
-        root = tk.Tk()
-        root.iconbitmap("images/icon.ico")
+        root = tk.Toplevel()
+        root.wm_iconphoto(True, tk.PhotoImage(file="images/icon.png"))
         root.resizable(False, False)
         root.title(LANG_LIST[14][lang])
 

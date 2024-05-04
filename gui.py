@@ -18,7 +18,7 @@ class IvonaGui(tk.Tk):
         self.frames = [tk.PhotoImage(file="images/bezi_talk.gif", format=f"gif -index {i}") for i in range(2)]
         self.neko_label = ttk.Label(self, image=self.frames[0])
         self.current_lang = 1
-        self.iconbitmap("images/icon.ico")
+        self.wm_iconphoto(True, tk.PhotoImage(file="images/icon.png"))
         self.gui_create()
         self.replace_dict = dicts.Dictionary()
         self.not_playing = True
@@ -167,8 +167,8 @@ class IvonaGui(tk.Tk):
 
         def show_about():
             """Function that shows the About window."""
-            about_root = tk.Tk()
-            about_root.iconbitmap("images/icon.ico")
+            about_root = tk.Toplevel()
+            about_root.wm_iconphoto(True, tk.PhotoImage(file="images/icon.png"))
             about_root.title(dicts.LANG_LIST[2][self.current_lang])
             about_root.resizable(width=False, height=False)
             about_root.geometry("250x60")
