@@ -96,10 +96,10 @@ class Dictionary:
             """Function that creates new Text objects"""
             current_row: int = main_panel.grid_size()[1]
 
-            from_text = tk.Text(main_panel, width=25, height=1)
+            from_text = tk.Text(main_panel, width=25, height=1, wrap=tk.WORD)
             from_text.grid(row=current_row, column=0, padx=3, pady=3)
 
-            to_text = tk.Text(main_panel, width=25, height=1)
+            to_text = tk.Text(main_panel, width=25, height=1, wrap=tk.WORD)
             to_text.grid(row=current_row, column=1, padx=3, pady=3)
 
             from_text.insert(tk.END, key)
