@@ -15,7 +15,7 @@ def get_final_string(voice: str, text: str) -> str:
     return f"https://gaming.nightcore.pl/ivonaapi/{voice}?text={urllib.parse.quote(text)}"
 
 
-def get_voice_request(voice: str, text: str, pitch: float, download: bool, progress_bar=None, progress_size=50) -> None:
+def get_voice_request(voice: str, text: str, pitch: float, download: bool, unlock_func=None, progress_bar=None, progress_size=50) -> None:
     """
     This function calls the Ivona API to get a voice audio file.
     If it is for preview only it saves it as a temporary file,
@@ -85,3 +85,6 @@ def get_voice_request(voice: str, text: str, pitch: float, download: bool, progr
             os.remove(temp_file.name)
         except Exception as e:
             print(f"Error type: {type(e).__name__}, Message: {str(e)}")
+    
+    if unlock_func:
+        unlock_func()

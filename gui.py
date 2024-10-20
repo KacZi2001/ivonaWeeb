@@ -55,12 +55,14 @@ class IvonaGui(tk.Tk):
         This method locks the play button.
         """
         self.play_button["state"] = "disabled"
+        self.save_button["state"] = "disabled"
     
     def unlock_btn(self):
         """
         This method unlocks the play button.
         """
         self.play_button["state"] = "normal"
+        self.save_button["state"] = "normal"
 
     def gui_create(self):
         """This method creates and sets up the GUI."""
@@ -94,8 +96,8 @@ class IvonaGui(tk.Tk):
         self.play_button.pack(fill=tk.X, pady=5)
         stop_button = ttk.Button(button_frame, text="Stop")
         stop_button.pack(fill=tk.X, pady=5)
-        save_button = ttk.Button(button_frame, text="Save file...")
-        save_button.pack(fill=tk.X, pady=5)
+        self.save_button = ttk.Button(button_frame, text="Save file...")
+        self.save_button.pack(fill=tk.X, pady=5)
         dict_button = ttk.Button(button_frame, text="Dictionary...",
                                  command=lambda: self.replace_dict.show_dict(self.current_lang))
         dict_button.pack(fill=tk.X, pady=5)
@@ -131,7 +133,7 @@ class IvonaGui(tk.Tk):
             menu_bar.entryconfig(2, label=lang_list[7][lang_index])
             self.play_button.config(text=lang_list[8][lang_index])
             stop_button.config(text=lang_list[9][lang_index])
-            save_button.config(text=lang_list[10][lang_index])
+            self.save_button.config(text=lang_list[10][lang_index])
             dict_button.config(text=lang_list[11][lang_index])
             pitch_slider.config(label=lang_list[12][lang_index])
             voice_label.config(text=lang_list[13][lang_index])
@@ -150,7 +152,7 @@ class IvonaGui(tk.Tk):
                                      args=(dicts.NAME_DICT[current_voice.get()],
                                            self._replace_text_with_dict(
                                                inp_text.get("1.0", tk.END)),
-                                           pitch.get(), False, self.progress_bar))
+                                           pitch.get(), False, None, self.progress_bar))
                 # Check if nothing is playing
                 if self.not_playing:
                     self.not_playing = False
@@ -187,10 +189,17 @@ class IvonaGui(tk.Tk):
         def save_audio():
             """Function that saves the audio in another thread."""
             if current_voice.get().strip() != "" and inp_text.get("1.0", tk.END).strip() != "":
+                self.lock_btn()
+
+                if hasattr(self, "progress_bar") and self.progress_bar.winfo_exists():
+                    self.progress_bar.pack_forget()
+
+                self.progress_bar['value'] = 0
+                self.progress_bar.pack(fill=tk.X, pady=20)
                 save_thread = Thread(target=voice_request.get_voice_request,
                                      args=(dicts.NAME_DICT[current_voice.get()],
                                            self._replace_text_with_dict(inp_text.get("1.0", tk.END)),
-                                           pitch.get(), True))
+                                           pitch.get(), True, self.unlock_btn, self.progress_bar))
                 save_thread.start()
 
         def show_about():
@@ -223,7 +232,7 @@ class IvonaGui(tk.Tk):
         self.bind_all("<Shift-Return>", lambda event: quick_play())
 
         self.play_button.config(command=play_audio)
-        save_button.config(command=save_audio)
+        self.save_button.config(command=save_audio)
         stop_button.config(command=stop_audio)
         file_menu.entryconfig(0, command=read_from_file)
         file_menu.entryconfig(1, command=save_audio)
