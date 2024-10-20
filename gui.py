@@ -49,6 +49,18 @@ class IvonaGui(tk.Tk):
             with open(filename, "r", encoding="utf-8") as f:
                 return f.read().strip()
         return ""
+    
+    def lock_btn(self):
+        """
+        This method locks the play button.
+        """
+        self.play_button["state"] = "disabled"
+    
+    def unlock_btn(self):
+        """
+        This method unlocks the play button.
+        """
+        self.play_button["state"] = "normal"
 
     def gui_create(self):
         """This method creates and sets up the GUI."""
@@ -78,8 +90,8 @@ class IvonaGui(tk.Tk):
         inp_text = scrolledtext.ScrolledText(self, wrap=tk.WORD, height=10, width=40)
         inp_text.grid(row=1, column=0, padx=10, pady=10, sticky=tk.W, columnspan=2)
 
-        play_button = ttk.Button(button_frame, text="Play", width=10)
-        play_button.pack(fill=tk.X, pady=5)
+        self.play_button = ttk.Button(button_frame, text="Play", width=10)
+        self.play_button.pack(fill=tk.X, pady=5)
         stop_button = ttk.Button(button_frame, text="Stop")
         stop_button.pack(fill=tk.X, pady=5)
         save_button = ttk.Button(button_frame, text="Save file...")
@@ -101,6 +113,8 @@ class IvonaGui(tk.Tk):
         voice_combobox.current(0)
         voice_combobox.pack(fill=tk.X)
 
+        self.progress_bar = ttk.Progressbar(upper_frame)
+
         # Changes program language
         def _set_language(lang_index: int):
             """Function that changes the language of the GUI."""
@@ -115,7 +129,7 @@ class IvonaGui(tk.Tk):
             lang_menu.entryconfig(0, label=lang_list[5][lang_index])
             lang_menu.entryconfig(1, label=lang_list[6][lang_index])
             menu_bar.entryconfig(2, label=lang_list[7][lang_index])
-            play_button.config(text=lang_list[8][lang_index])
+            self.play_button.config(text=lang_list[8][lang_index])
             stop_button.config(text=lang_list[9][lang_index])
             save_button.config(text=lang_list[10][lang_index])
             dict_button.config(text=lang_list[11][lang_index])
@@ -125,11 +139,18 @@ class IvonaGui(tk.Tk):
         def play_audio():
             """Function that plays the audio in another thread."""
             if current_voice.get().strip() != "" and inp_text.get("1.0", tk.END).strip() != "":
+                self.lock_btn()
+
+                if hasattr(self, "progress_bar") and self.progress_bar.winfo_exists():
+                    self.progress_bar.pack_forget()
+
+                self.progress_bar['value'] = 0
+                self.progress_bar.pack(fill=tk.X, pady=20)
                 play_thread = Thread(target=voice_request.get_voice_request,
                                      args=(dicts.NAME_DICT[current_voice.get()],
                                            self._replace_text_with_dict(
                                                inp_text.get("1.0", tk.END)),
-                                           pitch.get(), False))
+                                           pitch.get(), False, self.progress_bar))
                 # Check if nothing is playing
                 if self.not_playing:
                     self.not_playing = False
@@ -152,9 +173,16 @@ class IvonaGui(tk.Tk):
                             sleep(0.15)
                         self.neko_label.config(image=self.frames[0])
                         self.not_playing = True
+                        self.unlock_btn()
                         print("All done\n")
 
                     Thread(target=_animate_mascot, args=(0,)).start()
+
+        def stop_audio():
+            """Function that stops the audio"""
+            self.unlock_btn()
+            self.not_playing = True
+            audio_manipulation.stop_audio()
 
         def save_audio():
             """Function that saves the audio in another thread."""
@@ -194,9 +222,9 @@ class IvonaGui(tk.Tk):
         self.bind_all("<Control-S>", lambda event: save_audio())
         self.bind_all("<Shift-Return>", lambda event: quick_play())
 
-        play_button.config(command=play_audio)
+        self.play_button.config(command=play_audio)
         save_button.config(command=save_audio)
-        stop_button.config(command=audio_manipulation.stop_audio)
+        stop_button.config(command=stop_audio)
         file_menu.entryconfig(0, command=read_from_file)
         file_menu.entryconfig(1, command=save_audio)
         file_menu.entryconfig(3, command=show_about)
