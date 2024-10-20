@@ -26,24 +26,31 @@ def get_voice_request(voice: str, text: str, pitch: float, download: bool) -> No
         file_path = filedialog.asksaveasfilename(defaultextension=".wav",
                                                  filetypes=[("WAV Files", "*.wav")])
         if file_path:
-            print("Downloading file...")
-            urllib.request.urlretrieve(url, file_path)
+
+            try:
+                print("Downloading file...")
+                urllib.request.urlretrieve(url, file_path)
+
+                if pitch != 0.0:
+                    print(f"Shifting audio pitch to {pitch:.0f}...")
+                    audio_manipulation.pitch_shift(file_path, pitch)
+                    print("Pitch shifted")
+                print("All done\n")
+            except Exception as e:
+                print(str(e))
+
+    else:
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+                print("Getting audio...")
+                urllib.request.urlretrieve(url, temp_file.name)
 
             if pitch != 0.0:
                 print(f"Shifting audio pitch to {pitch:.0f}...")
-                audio_manipulation.pitch_shift(file_path, pitch)
-                print("Pitch shifted")
-            print("All done\n")
+                audio_manipulation.pitch_shift(temp_file.name, pitch)
 
-    else:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
-            print("Getting audio...")
-            urllib.request.urlretrieve(url, temp_file.name)
-
-        if pitch != 0.0:
-            print(f"Shifting audio pitch to {pitch:.0f}...")
-            audio_manipulation.pitch_shift(temp_file.name, pitch)
-
-        print("Playing audio...")
-        audio_manipulation.play_audio(temp_file.name)
-        os.remove(temp_file.name)
+            print("Playing audio...")
+            audio_manipulation.play_audio(temp_file.name)
+            os.remove(temp_file.name)
+        except Exception as e:
+            print(f"Error type: {type(e).__name__}, Message: {str(e)}")
